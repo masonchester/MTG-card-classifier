@@ -3,7 +3,7 @@ import json
 with open("scryfall_default_cards.json", 'r', encoding='utf-8') as f:
     cards = json.load(f)
 
-processed_cards = []
+processed_cards = set()
 types = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
 
 for card in cards:

@@ -1,5 +1,5 @@
-tensorflow=<<version_number>
-pandas=<<version_number>
-matplotlib = <<version_number>
-requests==<version_number>
-tqdm==<version_number>
+tensorflow <= 2.12.0
+pandas <= 2.1.1
+matplotlib <= 3.8.0
+requests <= 2.31.0
+tqdm <= 4.65.0

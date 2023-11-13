@@ -1,2 +1,0 @@
-requests==<version_number>
-tqdm==<version_number>

@@ -1,3 +1,2 @@
-import tesnorflow as tf
-import pandsa as pd
-import matplotlivb.pyplot as plt
+import tensorflow as tf
+import pandas as pd

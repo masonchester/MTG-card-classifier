@@ -1,0 +1,5 @@
+tensorflow=<<version_number>
+pandas=<<version_number>
+matplotlib = <<version_number>
+requests==<version_number>
+tqdm==<version_number>

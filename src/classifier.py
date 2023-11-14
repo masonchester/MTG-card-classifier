@@ -11,30 +11,30 @@ def dataframe_from_dir (dir_path):
     generates a dataframe containing the image path, class names and subclass names.
     '''
     
-    class_labels = list()
-    subclass_labels = list()
+    labels = list()
     image_paths = list()
 
     for class_name in os.listdir(dir_path):
         class_dir = os.path.join(dir_path, class_name)
         if os.path.isdir(class_dir):
-            for subclass in os.listdir(class_dir):
-                subclass_dir = os.path.join(class_dir,subclass)
+            for subclass_name in os.listdir(class_dir):
+                subclass_dir = os.path.join(class_dir,subclass_name)
                 if os.path.isdir(subclass_dir):
                     for filename in os.listdir(subclass_dir):
                         file_dir = os.path.join(subclass_dir, filename)
                         if os.path.isfile(file_dir):
                             image_paths.append(file_dir)
-                            class_labels.append(class_name)
-                            subclass_labels.append(subclass)
+                            str = class_name + "," + subclass_name
+                            labels.append(str)
 
     df = pd.DataFrame({
         "image paths":image_paths, 
-        "class_labels":class_labels, 
-        "subclass_labels":subclass_labels
+        "labels":labels, 
           })
     return df
 
 train_df = dataframe_from_dir(train_path)
+test_df = dataframe_from_dir(test_path)
+val_df = dataframe_from_dir(val_path)
 
 print(train_df.sample(5))

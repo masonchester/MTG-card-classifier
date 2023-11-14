@@ -19,7 +19,7 @@ for card in cards:
                     processed_card = {
                         'name': card_name,
                         'image_url': card['image_uris']['art_crop'],
-                        'color_identity': card_colors,
+                        'colors': card_colors,
                         'type': primary_type,
                         'highres_image': highres
                     }

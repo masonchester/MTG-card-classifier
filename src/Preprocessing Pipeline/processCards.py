@@ -13,7 +13,7 @@ for card in cards:
         highres = card.get('highres_image', False)
         
         if primary_type in types:
-            card_colors = card.get('colors', ["C"]) if card.get('colors') else ["C"]
+            card_colors = card.get('color_identity', ["C"]) if card.get('color_identity') else ["C"]
             if len(card_colors) == 1:
                 if card_name not in processed_cards_dict or (card_name in processed_cards_dict and highres):
                     processed_card = {

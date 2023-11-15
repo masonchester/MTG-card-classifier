@@ -4,7 +4,7 @@ with open("scryfall_default_cards.json", 'r', encoding='utf-8') as f:
     cards = json.load(f)
 
 processed_cards_dict = {}
-types = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
+types = ['Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
 
 for card in cards:
     if 'image_uris' in card and 'art_crop' in card['image_uris'] and 'type_line' in card:

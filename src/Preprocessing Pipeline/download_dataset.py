@@ -20,7 +20,7 @@ with open("/Users/masonchester/MTG-card-classifier/src/Preprocessing Pipeline/pr
     cards = json.load(f)
 
 colors = ['W', 'U', 'B', 'R', 'G', 'C']
-types = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
+types = [ 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
 
 base_paths = {
     "train": "images/train",

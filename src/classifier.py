@@ -26,7 +26,7 @@ def gen_dataframe_from_dir (dir_path):
                         file_dir = os.path.join(subclass_dir, filename)
                         if os.path.isfile(file_dir):
                             image_paths.append(file_dir)
-                            str = class_name + "," + subclass_name
+                            str = class_name + ", " + subclass_name
                             labels.append(str)
 
     df = pd.DataFrame({
@@ -36,39 +36,19 @@ def gen_dataframe_from_dir (dir_path):
     return df
    
 def gen_dataset(df_X):
-    # TO-DO: Implement a way to encode the labels from the dataframes
-    return data
+    data_X = df_X.drop('labels', axis=1)
+    data_y = df_X['labels'].str.get_dummies(', ')
+    return data_X, data_y
 
 train_df = gen_dataframe_from_dir(train_path)
 test_df = gen_dataframe_from_dir(test_path)
 val_df = gen_dataframe_from_dir(val_path)
 
-train_data = gen_dataset(train_df)
-test_data = gen_dataset(test_df)
-val_data = gen_dataset(val_df)
+train_X, train_y = gen_dataset(train_df)
+test_X, test_y = gen_dataset(test_df)
+val_X, val_y = gen_dataset(val_df)
 
-def plot_images_from_generator(generator, num_images=5):
-    # Get a batch of images and labels from the generator
-    for i, (images, labels) in enumerate(generator):
-        # Set up the grid of subplots
-        num_rows = num_images // 5 + int(num_images % 5 != 0)
-        plt.figure(figsize=(20, 4 * num_rows))
-        
-        # Only take the number of images you want to plot
-        for j in range(num_images):
-            plt.subplot(num_rows, 5, j+1)
-            plt.imshow(images[j])
-         
-            plt.axis('off')
-        
-        # Break the loop after the first batch to prevent infinite loops
-        break
-
-    plt.tight_layout()
-    plt.show()
-
-# Plot images from the training data
-plot_images_from_generator(train_data, num_images=10)
+print(train_y.sample(5))
 
 base_model = tf.keras.applications.resnet_v2.ResNet152V2(
     include_top=False,
@@ -91,4 +71,4 @@ model = tf.keras.models.Sequential([
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(train_data, epochs=10, validation_data=val_data)
+model.fit(x=train_X, y=train_y, epochs=10, validation_data=(val_X, val_y))

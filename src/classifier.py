@@ -2,10 +2,11 @@
 import tensorflow as tf
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
-train_path = "/Users/masonchester/MTG-card-classifier/images/train"
-test_path = "/Users/masonchester/MTG-card-classifier/images/test"
-val_path = "/Users/masonchester/MTG-card-classifier/images/validation"
+train_path = "images/train"
+test_path = "images/test"
+val_path = "images/validation"
 
 def gen_dataframe_from_dir (dir_path):
     '''
@@ -35,19 +36,7 @@ def gen_dataframe_from_dir (dir_path):
     return df
    
 def gen_dataset(df_X):
-    '''
-    generates image datasets from a provided dataframe 
-    containing image filepaths in one columns and labels in the other.
-    '''
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator()
-    data = datagen.flow_from_dataframe(
-        df_X,
-        x_col='image paths',
-        y_col='labels',
-        target_size=(244,244),
-        batch_size=128,
-        class_mode='categorical'
-    )
+    # TO-DO: Implement a way to encode the labels from the dataframes
     return data
 
 train_df = gen_dataframe_from_dir(train_path)
@@ -58,15 +47,39 @@ train_data = gen_dataset(train_df)
 test_data = gen_dataset(test_df)
 val_data = gen_dataset(val_df)
 
+def plot_images_from_generator(generator, num_images=5):
+    # Get a batch of images and labels from the generator
+    for i, (images, labels) in enumerate(generator):
+        # Set up the grid of subplots
+        num_rows = num_images // 5 + int(num_images % 5 != 0)
+        plt.figure(figsize=(20, 4 * num_rows))
+        
+        # Only take the number of images you want to plot
+        for j in range(num_images):
+            plt.subplot(num_rows, 5, j+1)
+            plt.imshow(images[j])
+         
+            plt.axis('off')
+        
+        # Break the loop after the first batch to prevent infinite loops
+        break
+
+    plt.tight_layout()
+    plt.show()
+
+# Plot images from the training data
+plot_images_from_generator(train_data, num_images=10)
+
 base_model = tf.keras.applications.resnet_v2.ResNet152V2(
     include_top=False,
-    weight='imagenet',
-    input_shape=(244,244,3),
+    weights='imagenet',
+    input_shape=(299,299,3),
 )
 
 base_model.trainable = False
 
 top_model = tf.keras.Sequential([
+     tf.keras.layers.Flatten(),
      tf. keras.layers.Dense(1024, activation='relu'),  
      tf.keras.layers.Dense(36, activation='softmax')
 ])

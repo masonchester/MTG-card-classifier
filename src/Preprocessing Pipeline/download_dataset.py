@@ -16,7 +16,7 @@ def download_image(url, save_path):
             for chunk in response.iter_content(1024):
                 f.write(chunk)
 
-with open("/Users/masonchester/MTG-card-classifier/src/Preprocessing Pipeline/processed_cards.json", 'r', encoding='utf-8') as f:
+with open("processed_cards.json", 'r', encoding='utf-8') as f:
     cards = json.load(f)
 
 colors = ['W', 'U', 'B', 'R', 'G', 'C']

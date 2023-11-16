@@ -36,6 +36,10 @@ def gen_dataframe_from_dir (dir_path):
     return df
    
 def gen_dataset(df_X):
+    '''
+    generates an X and y dataset consisting of image files 
+    paths in X and one-hot encoded labels in y.
+    '''
     data_X = df_X.drop('labels', axis=1)
     data_y = df_X['labels'].str.get_dummies(', ')
     return data_X, data_y

@@ -48,4 +48,5 @@ for i, card in tqdm(enumerate(cards), total=len(cards), desc="Downloading images
     os.makedirs(type_directory, exist_ok=True)
     
     save_path = os.path.join(type_directory, img_name)
-    download_image(img_url, save_path)
+    if not os.path.exists(save_path):
+        download_image(img_url, save_path)

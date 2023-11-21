@@ -3,11 +3,10 @@ import requests
 import json
 from tqdm import tqdm
 
-def create_directories(base_path, colors, types):
-    for color in colors:
-        for type_ in types:
-            dir_path = os.path.join(base_path, color, type_)
-            os.makedirs(dir_path, exist_ok=True)
+def create_directories(base_path, types):
+    for type_ in types:
+        dir_path = os.path.join(base_path, type_)
+        os.makedirs(dir_path, exist_ok=True)
 
 def download_image(url, save_path):
     response = requests.get(url, stream=True)
@@ -19,7 +18,6 @@ def download_image(url, save_path):
 with open("processed_cards.json", 'r', encoding='utf-8') as f:
     cards = json.load(f)
 
-colors = ['W', 'U', 'B', 'R', 'G', 'C']
 types = [ 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
 
 base_paths = {
@@ -29,7 +27,7 @@ base_paths = {
 }
 
 for path in base_paths.values():
-    create_directories(path, colors, types)
+    create_directories(path, types)
 
 train_size = int(0.7 * len(cards))
 val_size = int(0.15 * len(cards))
@@ -37,13 +35,11 @@ val_size = int(0.15 * len(cards))
 for i, card in tqdm(enumerate(cards), total=len(cards), desc="Downloading images"):
     img_url = card['image_url']
     img_name = os.path.basename(img_url.split("?")[0])
-    color = card['colors'][0] #if card['colors'][0] != 'C' else 'Colorless'
     type_ = card['type']
     if type_ not in types:
         continue 
     directory = "train" if i < train_size else "validation" if i < train_size + val_size else "test"
-    color_directory = os.path.join(base_paths[directory], color)
-    type_directory = os.path.join(color_directory, type_)
+    type_directory = os.path.join(base_paths[directory], type_)
     
     os.makedirs(type_directory, exist_ok=True)
     

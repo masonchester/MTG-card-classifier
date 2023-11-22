@@ -76,7 +76,7 @@ test_data  = gen_dataset(test_df)
 val_data = gen_dataset(val_df)
 
 
-base_model = tf.keras.applications.resnet_v2.ResNet152V2(
+base_model = tf.keras.applications.resnet_v2.ResNet50V2(
     include_top=False,
     weights='imagenet',
     input_shape=(299, 299, 3),

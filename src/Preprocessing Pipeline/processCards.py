@@ -4,7 +4,7 @@ with open("scryfall_default_cards.json", 'r', encoding='utf-8') as f:
     cards = json.load(f)
 
 processed_cards_dict = {}
-types = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
+types = ['Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land']
 
 for card in cards:
     if 'image_uris' in card and 'art_crop' in card['image_uris'] and 'type_line' in card:
@@ -13,17 +13,14 @@ for card in cards:
         highres = card.get('highres_image', False)
         
         if primary_type in types:
-            card_colors = card.get('color_identity', ["C"]) if card.get('color_identity') else ["C"]
-            if len(card_colors) == 1:
-                if card_name not in processed_cards_dict or (card_name in processed_cards_dict and highres):
-                    processed_card = {
-                        'name': card_name,
-                        'image_url': card['image_uris']['art_crop'],
-                        'colors': card_colors,
-                        'type': primary_type,
-                        'highres_image': highres
-                    }
-                    processed_cards_dict[card_name] = processed_card
+             if card_name not in processed_cards_dict or (card_name in processed_cards_dict and highres):
+                processed_card = {
+                    'name': card_name,
+                    'image_url': card['image_uris']['art_crop'],
+                    'type': primary_type,
+                    'highres_image': highres
+                }
+                processed_cards_dict[card_name] = processed_card
 
 processed_cards = list(processed_cards_dict.values())
 

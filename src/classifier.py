@@ -2,7 +2,7 @@
 import tensorflow as tf
 import pandas as pd
 import os
-import numpy as np
+from sklearn.preprocessing import LabelBinarizer
 import matplotlib.pyplot as plt
 
 train_path = "images/train"
@@ -41,7 +41,10 @@ def gen_dataset(df_X):
     paths in X and one-hot encoded labels in y and zips them in a dataset object.
     '''
     data_X = df_X['image paths']
-    data_y = df_X['labels'].str.get_dummies(',')
+    data_y = df_X['labels']
+
+    mlb = LabelBinarizer()
+    data_y = mlb.fit_transform(data_y)
 
     dataset = tf.data.Dataset.from_tensor_slices((data_X, data_y))
     dataset = dataset.map(load_and_preprocess_image)
@@ -73,7 +76,7 @@ test_data  = gen_dataset(test_df)
 val_data = gen_dataset(val_df)
 
 
-base_model = tf.keras.applications.resnet_v2.ResNet50V2(
+base_model = tf.keras.applications.resnet_v2.ResNet152V2(
     include_top=False,
     weights='imagenet',
     input_shape=(299, 299, 3),
@@ -82,12 +85,14 @@ base_model = tf.keras.applications.resnet_v2.ResNet50V2(
 base_model.trainable = False
 
 top_model = tf.keras.Sequential([
-     tf.keras.layers.GlobalAveragePooling2D(),
-     tf. keras.layers.Dense(1024, activation='relu'),  
+     tf.keras.layers.Flatten(),
+     tf.keras.layers.Dense(64, activation='relu'),
+     tf.keras.layers.Dropout(0.5),
+     tf.keras.layers.BatchNormalization(),
      tf.keras.layers.Dense(6, activation='softmax')
 ])
 
-model = tf.keras.models.Sequential([
+model = tf.keras.models.Sequential([                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     base_model,
     top_model
 ])

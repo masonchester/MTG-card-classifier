@@ -1,10 +1,9 @@
 import tensorflow as tf
 import pandas as pd
 import os
+import numpy as np
 from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import precision_score, recall_score
-import matplotlib.pyplot as plt
-import time
+from sklearn.metrics import multilabel_confusion_matrix, precision_score, recall_score, f1_score
 
 train_path = "images/train"
 test_path = "images/test"
@@ -38,23 +37,7 @@ def gen_dataset(df_X, augment=False):
 
     mlb = LabelBinarizer()
     data_y = mlb.fit_transform(data_y)
-
     dataset = tf.data.Dataset.from_tensor_slices((data_X, data_y))
-
-    if augment:
-        # Data augmentation
-        data_augmentation = tf.keras.preprocessing.image.ImageDataGenerator(
-            rotation_range=20,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            shear_range=0.2,
-            zoom_range=0.2,
-            horizontal_flip=True,
-            fill_mode='nearest'
-        )
-
-        dataset = dataset.map(lambda x, y: (data_augmentation(x, training=True), y))
-
     dataset = dataset.map(load_and_preprocess_image)
     dataset = dataset.batch(64)
 
@@ -126,10 +109,10 @@ early_stopping = tf.keras.callbacks.EarlyStopping(
 history = model.fit(x=train_data, epochs=10, validation_data=val_data, callbacks=[early_stopping])
 
 # Extracting metrics
-training_accuracy = history.history['accuracy'][-1]
-validation_accuracy = history.history['val_accuracy'][-1]
-loss = history.history['loss'][-1]
-validation_loss = history.history['val_loss'][-1]
+training_accuracy = sum(history.history['accuracy']) / 10
+validation_accuracy = sum(history.history['val_accuracy']) / 10
+loss = sum(history.history['loss']) / 10
+validation_loss = sum(history.history['val_loss']) / 10
 
 print(f'Training Accuracy: {training_accuracy * 100:.2f}%')
 print(f'Validation Accuracy: {validation_accuracy * 100:.2f}%')
@@ -138,21 +121,23 @@ print(f'Validation Loss: {validation_loss:.4f}')
 
 # Evaluation metrics for precision and recall
 predictions = model.predict(test_data)
-predicted_labels = mlb.inverse_transform(predictions)
-true_labels = mlb.inverse_transform(test_data.map(lambda x, y: y))
 
-predicted_labels = [label for sublist in predicted_labels for label in sublist]
-true_labels = [label for sublist in true_labels for label in sublist]
+true_labels = list()
+for _,labels in test_data:
+    for label in labels:
+        true_labels.append(np.array(label))
 
-precision = precision_score(true_labels, predicted_labels, average='weighted')
-recall = recall_score(true_labels, predicted_labels, average='weighted')
+mlb = LabelBinarizer()
+mlb.fit(test_data)
+predictions = mlb.inverse_transform(predictions)
+true_labels = mlb.inverse_transform(true_labels)
+mlcm = multilabel_confusion_matrix(y_true=true_labels, y_pred=predictions)
 
-print(f'Precision: {precision:.4f}')
-print(f'Recall: {recall:.4f}')
+# Calculate precision, recall, and F1-score
+precision = precision_score(true_labels, predictions, average='macro')
+recall = recall_score(true_labels, predictions, average='macro')
+f1 = f1_score(true_labels, predictions, average='macro')
 
-# Processing Time
-start_time = time.time()
-model.fit(x=train_data, epochs=10, validation_data=val_data, callbacks=[early_stopping])
-end_time = time.time()
-processing_time = end_time - start_time
-print(f'Processing Time: {processing_time:.2f} seconds')
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1-Score:", f1)
